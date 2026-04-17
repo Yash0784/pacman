@@ -1,0 +1,289 @@
+#include <stdio.h>
+#include <ncurses.h>
+#include <locale.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include "movement.h"
+#include "ghosts.h"
+#include <stdlib.h>
+#include <time.h>
+//#define GHOST_COLOR_PAIR 1
+#define WIDTH 55
+#define HEIGHT 24
+#define wall_char '#'
+#define GHOST_COLOR_PAIR 6
+#define EXIT 3
+#define OPTIONS 2
+#define YELLOW 34
+#define GREEN_BLACK 1 
+#define BLUE_BLACK 6
+#define RED_BLACK 7
+#define MAGENTA_BLACK 67
+#define CYAN_BLACK 68
+char ghost_color[] = {RED_BLACK, MAGENTA_BLACK, CYAN_BLACK, YELLOW};
+int game = 1;
+me* ply;
+char grid[HEIGHT][WIDTH];
+char new_grid[HEIGHT][WIDTH];
+me* ghosts[4];
+void put_entities();
+char* get_avt(char sym);
+int get_ind(char sym);
+void loadgrid(){
+    FILE* gridf = fopen("grid2copy.txt", "r");
+    int h = 0;
+    while(fgets(grid[h], 55, gridf) != NULL){
+        grid[h][strcspn(grid[h], "\n")] = '\0';
+        h++;
+    }
+    fclose(gridf);
+}
+
+void print_grid(){
+    for(int y = 0; y < HEIGHT; y++){
+        for(int x = 0; x < WIDTH; x++){
+            if(new_grid[y][x] != '\0'){
+                if(new_grid[y][x] == '#'){
+                    mvaddch(y, x, ACS_CKBOARD | COLOR_PAIR(1));
+                }
+                else{
+                    if(new_grid[y][x] == '.'){
+                        mvaddch(y, x, new_grid[y][x] | COLOR_PAIR(GREEN_BLACK));
+                    }
+                    else{
+                        if(new_grid[y][x] == ' '){
+                            mvaddch(y, x, new_grid[y][x]);
+                        }
+                        else{
+                            if(new_grid[y][x] == 'p'){
+                                attron(COLOR_PAIR(GREEN_BLACK));
+                                mvaddstr(y, x, get_avt(new_grid[y][x]));
+                                attroff(COLOR_PAIR(GREEN_BLACK));
+                            }
+                            else{
+                                attron(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                mvaddstr(y, x, get_avt(new_grid[y][x]));
+                                attroff(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                            }
+                            //debug here
+                            x++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void pacman(){
+    ply = (me*)malloc(sizeof(me));
+    ply->name = strdup("Pacman");
+    ply->avt = strdup("ᗧ");
+    ply->sym = 'p';
+    ply->x = 1;
+    ply->y = 1;
+    ply->dx = 0;
+    ply->dy = 1;
+    ply->speed = 1;
+    ply->nx = 1;
+    ply->ny = 2;
+    for(int i = 0; i < 4; i++){
+        ghosts[i] = (me*)malloc(sizeof(me));
+    }
+    ghosts[0]->name = strdup("Blinky");
+    ghosts[0]->avt = strdup("👻");
+    ghosts[0]->sym = 'B';
+    ghosts[0]->x = 11;
+    ghosts[0]->y = 21;
+    ghosts[0]->dx = 0;;
+    ghosts[0]->dy = 1;
+    ghosts[0]->speed = 1;
+    ghosts[0]->nx = 11;
+    ghosts[0]->ny = 22;
+    ghosts[1]->name = strdup("Pinky");
+    ghosts[1]->avt = strdup("👻");
+    ghosts[1]->sym = 'P';
+    ghosts[1]->x = 11;
+    ghosts[1]->y = 23;
+    ghosts[1]->dx = 0;
+    ghosts[1]->dy = 1;
+    ghosts[1]->speed = 1;
+    ghosts[1]->nx = 11;
+    ghosts[1]->ny = 24;
+    ghosts[2]->name = strdup("Inky");
+    ghosts[2]->avt = strdup("👻");
+    ghosts[2]->sym = 'I';
+    ghosts[2]->x = 11;
+    ghosts[2]->y = 27;
+    ghosts[2]->dx = 0;
+    ghosts[2]->dy = -1;
+    ghosts[2]->speed = 1;
+    ghosts[2]->nx = 11;
+    ghosts[2]->ny = 26;
+    ghosts[3]->name = strdup("Clyde");
+    ghosts[3]->avt = strdup("👻");
+    ghosts[3]->sym = 'C';
+    ghosts[3]->x = 11;
+    ghosts[3]->y = 29;
+    ghosts[3]->dx = 0;
+    ghosts[3]->dy = -1;
+    ghosts[3]->speed = 1;
+    ghosts[3]->nx = 11;
+    ghosts[3]->ny = 28;
+    srand(time(NULL));
+    //setlocale(LC_ALL, "");
+    loadgrid();
+    //initscr();
+    noecho();
+    curs_set(0);
+    cbreak();
+    nodelay(stdscr, TRUE);
+    //start_color();
+    init_pair(BLUE_BLACK, COLOR_BLUE, COLOR_BLACK);
+    init_pair(RED_BLACK, COLOR_RED, COLOR_BLACK);
+    init_pair(MAGENTA_BLACK, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(CYAN_BLACK, COLOR_CYAN, COLOR_BLACK);
+    print_grid();
+    refresh();
+    int scat = 0;
+    int frightened = 0;
+    int buff_in = -1;
+    int in = -1;
+    int curr_in;
+    int started = 0;
+    int blink = 0;
+    time_t start_time = time(NULL);
+    while(game){
+        time_t current_time = time(NULL);
+        double time_elapsed = difftime(current_time, start_time);
+        if(time_elapsed <= 10 && time_elapsed >=0) scat = 1;
+        if(time_elapsed <= 60 && time_elapsed > 10) scat = 0;
+        if(time_elapsed <= 67 && time_elapsed > 60) scat = 1;
+        if(time_elapsed <= 120 && time_elapsed > 67) scat = 0;
+        if(time_elapsed <= 130 && time_elapsed > 120) scat = 1;
+        if(time_elapsed > 130) scat = 0;
+        curr_in = getch();
+        if(curr_in != ERR){
+            in = curr_in;
+            started = 1;
+        }
+        if(!started){
+            blink++;
+            if(blink%2){
+                mvaddstr(ply->x, ply->y, "  ");
+            }
+            else{
+                mvaddstr(ply->x, ply->y, "👻");
+                for(int i = 0; i < 4; i++){
+                    ghost_spawn(grid, ghosts[i]);
+                }
+            }
+            refresh();
+            napms(100);
+        }
+
+        if(in == 'q'){
+            game = 0;
+            continue;
+        }
+        if(1){//tspmoooooooooooooooooooooooooo
+            if(scat){
+                scatter(grid, ghosts, 4);
+            }
+            else{
+                if(frightened){
+                    for(int i = 0; i < 4; i++){
+                        pick_random_dir(grid, ghosts[i], -1);
+                    }
+                }
+                else{
+                    target_pacman(grid, ply, ghosts[0]);
+                    target_ahead(grid, ply->x + 4*ply->dx, ply->y + 4*ply->dy, ghosts[1]);
+                    if(calc_man_dist(ply->x, ply->y, ghosts[3]->x, ghosts[3]->y) > 8){
+                        target_pacman(grid, ply, ghosts[3]);
+                    }
+                    else{
+                        greedy_move(grid, ghosts[3], 22, 1);
+                    }
+                    get_inky_pos(grid, ghosts[2], ghosts[0], ply);
+                }
+            }
+        }
+
+        int vturn;
+        if(in != -1){
+            vturn = turn(grid, (char)in, ply);
+            if(vturn){
+                buff_in = in;
+            }
+            else{ 
+                int ivturn = turn(grid, (char)buff_in, ply);
+            }
+        }
+        put_entities();
+        print_grid();   
+        refresh();
+        int speed = 150;
+        if((char)buff_in != 'a' && (char)buff_in != 'd'){
+            speed *= 2;
+        }
+        attron(COLOR_PAIR(2));
+        mvprintw(0, 70, "%-3d, %-3d", ply->x, ply->y);
+        attroff(COLOR_PAIR(2));
+        flushinp();
+        napms(speed);
+    }
+    put_entities();
+    endwin();
+    for(int i = 0; i < HEIGHT; i++){
+        new_grid[i][strcspn(new_grid[i], "\0")] = '\n';
+        fputs(new_grid[i], stdout);
+    }
+    return ;
+}
+void put_entities(){
+    for(int y = 0; y < HEIGHT; y++){
+        for(int x = 0; x < WIDTH; x++){
+            new_grid[y][x] = grid[y][x];
+        }
+    }
+    new_grid[ply->x][ply->y] = ply->sym;
+    new_grid[ply->x][ply->y+1] = ply->sym;
+    for(int i = 0; i < 4; i++){ 
+        new_grid[ghosts[i]->x][ghosts[i]->y] = ghosts[i]->sym;
+        new_grid[ghosts[i]->x][ghosts[i]->y + 1] = ghosts[i]->sym;
+    }
+    return;
+}
+char* get_avt(char sym){
+    if(sym == 'p'){
+        return ply->avt;
+    }
+    if(sym == 'B'){
+        return ghosts[0]->avt;
+    }
+    if(sym == 'P'){
+        return ghosts[1]->avt;
+    }
+    if(sym == 'I'){
+        return ghosts[2]->avt;
+    }
+    if(sym == 'C'){
+        return ghosts[3]->avt;
+    }
+}
+int get_ind(char sym){
+    if(sym == 'B'){
+        return 0;
+    }
+    if(sym == 'P'){
+        return 1;
+    }
+    if(sym == 'I'){
+        return 2;
+    }
+    if(sym == 'C'){
+        return 3;
+    }
+}
