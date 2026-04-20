@@ -21,8 +21,11 @@
 #define RED_BLACK 7
 #define MAGENTA_BLACK 67
 #define CYAN_BLACK 68
+#define RED_RED 69
 char ghost_color[] = {RED_BLACK, MAGENTA_BLACK, CYAN_BLACK, YELLOW};
 int game = 1;
+int rem_lives = 3;
+
 me* ply;
 char grid[HEIGHT][WIDTH];
 char new_grid[HEIGHT][WIDTH];
@@ -45,11 +48,11 @@ void print_grid(){
         for(int x = 0; x < WIDTH; x++){
             if(new_grid[y][x] != '\0'){
                 if(new_grid[y][x] == '#'){
-                    mvaddch(y, x, ACS_CKBOARD | COLOR_PAIR(1));
+                    mvaddch(y, x, ACS_CKBOARD | COLOR_PAIR(RED_RED));
                 }
                 else{
                     if(new_grid[y][x] == '.'){
-                        mvaddch(y, x, new_grid[y][x] | COLOR_PAIR(GREEN_BLACK));
+                        mvaddch(y, x, new_grid[y][x] | COLOR_PAIR(YELLOW));
                     }
                     else{
                         if(new_grid[y][x] == ' '){
@@ -57,14 +60,14 @@ void print_grid(){
                         }
                         else{
                             if(new_grid[y][x] == 'p'){
-                                attron(COLOR_PAIR(GREEN_BLACK));
+                                //attron(COLOR_PAIR(GREEN_BLACK));
                                 mvaddstr(y, x, get_avt(new_grid[y][x]));
-                                attroff(COLOR_PAIR(GREEN_BLACK));
+                                //attroff(COLOR_PAIR(GREEN_BLACK));
                             }
                             else{
-                                attron(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                //attron(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
                                 mvaddstr(y, x, get_avt(new_grid[y][x]));
-                                attroff(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                //attroff(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
                             }
                             //debug here
                             x++;
@@ -78,59 +81,14 @@ void print_grid(){
 
 void pacman(){
     ply = (me*)malloc(sizeof(me));
-    ply->name = strdup("Pacman");
-    ply->avt = strdup("ᗧ");
-    ply->sym = 'p';
-    ply->x = 1;
-    ply->y = 1;
-    ply->dx = 0;
-    ply->dy = 1;
-    ply->speed = 1;
-    ply->nx = 1;
-    ply->ny = 2;
     for(int i = 0; i < 4; i++){
         ghosts[i] = (me*)malloc(sizeof(me));
     }
-    ghosts[0]->name = strdup("Blinky");
-    ghosts[0]->avt = strdup("👻");
-    ghosts[0]->sym = 'B';
-    ghosts[0]->x = 11;
-    ghosts[0]->y = 21;
-    ghosts[0]->dx = 0;;
-    ghosts[0]->dy = 1;
-    ghosts[0]->speed = 1;
-    ghosts[0]->nx = 11;
-    ghosts[0]->ny = 22;
-    ghosts[1]->name = strdup("Pinky");
-    ghosts[1]->avt = strdup("👻");
-    ghosts[1]->sym = 'P';
-    ghosts[1]->x = 11;
-    ghosts[1]->y = 23;
-    ghosts[1]->dx = 0;
-    ghosts[1]->dy = 1;
-    ghosts[1]->speed = 1;
-    ghosts[1]->nx = 11;
-    ghosts[1]->ny = 24;
-    ghosts[2]->name = strdup("Inky");
-    ghosts[2]->avt = strdup("👻");
-    ghosts[2]->sym = 'I';
-    ghosts[2]->x = 11;
-    ghosts[2]->y = 27;
-    ghosts[2]->dx = 0;
-    ghosts[2]->dy = -1;
-    ghosts[2]->speed = 1;
-    ghosts[2]->nx = 11;
-    ghosts[2]->ny = 26;
-    ghosts[3]->name = strdup("Clyde");
-    ghosts[3]->avt = strdup("👻");
-    ghosts[3]->sym = 'C';
-    ghosts[3]->x = 11;
-    ghosts[3]->y = 29;
-    ghosts[3]->dx = 0;
-    ghosts[3]->dy = -1;
-    ghosts[3]->speed = 1;
-    ghosts[3]->nx = 11;
-    ghosts[3]->ny = 28;
+    spawn_p(ply);
+    spawn_B(ghosts[0]);
+    spawn_P(ghosts[1]);
+    spawn_I(ghosts[2]);
+    spawn_C(ghosts[3]);
     srand(time(NULL));
     //setlocale(LC_ALL, "");
     loadgrid();
@@ -144,6 +102,7 @@ void pacman(){
     init_pair(RED_BLACK, COLOR_RED, COLOR_BLACK);
     init_pair(MAGENTA_BLACK, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(CYAN_BLACK, COLOR_CYAN, COLOR_BLACK);
+    init_pair(RED_RED, COLOR_RED, COLOR_RED);
     print_grid();
     refresh();
     int scat = 0;
@@ -154,15 +113,18 @@ void pacman(){
     int started = 0;
     int blink = 0;
     time_t start_time = time(NULL);
-    while(game){
+    while(game && rem_lives){
+        //for(int i = 0; i < rem_lives; i++){
+          //  mvprintw(20, 80 + 2*i, "❤️");
+        //}
         time_t current_time = time(NULL);
         double time_elapsed = difftime(current_time, start_time);
-        if(time_elapsed <= 10 && time_elapsed >=0) scat = 1;
-        if(time_elapsed <= 60 && time_elapsed > 10) scat = 0;
-        if(time_elapsed <= 67 && time_elapsed > 60) scat = 1;
-        if(time_elapsed <= 120 && time_elapsed > 67) scat = 0;
-        if(time_elapsed <= 130 && time_elapsed > 120) scat = 1;
-        if(time_elapsed > 130) scat = 0;
+        if(time_elapsed <= 5 && time_elapsed >=0) scat = 1;
+        if(time_elapsed <= 25 && time_elapsed > 5) scat = 0;
+        if(time_elapsed <= 30 && time_elapsed > 25) scat = 1;
+        if(time_elapsed <= 50 && time_elapsed > 30) scat = 0;
+        if(time_elapsed <= 55 && time_elapsed > 50) scat = 1;
+        if(time_elapsed > 55) scat = 0;
         curr_in = getch();
         if(curr_in != ERR){
             in = curr_in;
@@ -174,7 +136,7 @@ void pacman(){
                 mvaddstr(ply->x, ply->y, "  ");
             }
             else{
-                mvaddstr(ply->x, ply->y, "👻");
+                mvaddstr(ply->x, ply->y, "ᗧ");
                 for(int i = 0; i < 4; i++){
                     ghost_spawn(grid, ghosts[i]);
                 }
@@ -223,6 +185,9 @@ void pacman(){
         }
         put_entities();
         print_grid();   
+        for(int i = 0; i < rem_lives; i++){
+            mvprintw(20, 80 + 2*i, "❤️");
+        }
         refresh();
         int speed = 150;
         if((char)buff_in != 'a' && (char)buff_in != 'd'){
@@ -231,6 +196,26 @@ void pacman(){
         attron(COLOR_PAIR(2));
         mvprintw(0, 70, "%-3d, %-3d", ply->x, ply->y);
         attroff(COLOR_PAIR(2));
+        int c[] = {0, 0, 0, 0};
+        for(int i = 0; i < 4; i++){
+            if(((abs(ply->x - ghosts[i]->x) + abs(ply->y - ghosts[i]->y)) == 1 && ply->dx == - ghosts[i]->dx && ply->dy == - ghosts[i]->dy) || (ply->x == ghosts[i]->x && ply->y == ghosts[i]->y)) c[i] = 1;
+        }
+        if(c[0] || c[1] || c[2] || c[3]){
+            rem_lives--;
+            clear();
+            if(rem_lives == 0){
+                game = 0;
+            }
+            else{
+                start_time = time(NULL);
+                time_elapsed = 0;
+                spawn_p(ply);
+                spawn_B(ghosts[0]);
+                spawn_P(ghosts[1]);
+                spawn_I(ghosts[2]);
+                spawn_C(ghosts[3]);
+            }
+        }
         flushinp();
         napms(speed);
     }

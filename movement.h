@@ -26,4 +26,10 @@ int turn(char grid[HEIGHT][WIDTH], char plyin, me* ply);
 int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y);
 int pick_random_dir(char grid[HEIGHT][WIDTH], me* ply, int valid_moves);
 int chocolate(int a, int b);
+int respawn(char grid[HEIGHT][WIDTH], int xs, int ys, me* entity);
+void spawn_p(me* ply);
+void spawn_B(me* ghost);
+void spawn_P(me* ghost);
+void spawn_I(me* ghost);
+void spawn_C(me* ghost);
 #endif

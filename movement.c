@@ -137,7 +137,7 @@ int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y){
     
     change_pos(grid, ghost);
     
-    if(ghost->dx) napms(100);
+    //if(ghost->dx) napms(300);
 
     return 1;
 }
@@ -197,6 +197,66 @@ int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
         pick_random_dir(grid, ghost, valid_moves);
         return 0;
     }
-    
+}
+
+void spawn_p(me* ply){
+    ply->name = strdup("Pacman");
+    ply->avt = strdup("ᗧ");
+    ply->sym = 'p';
+    ply->x = 1;
+    ply->y = 1;
+    ply->dx = 0;
+    ply->dy = 1;
+    ply->speed = 1;
+    ply->nx = 1;
+    ply->ny = 2;
+}
+void spawn_B(me* ghost){
+    ghost->name = strdup("Blinky");
+    ghost->avt = strdup("👻");
+    ghost->sym = 'B';
+    ghost->x = 11;
+    ghost->y = 21;
+    ghost->dx = 0;;
+    ghost->dy = 1;
+    ghost->speed = 1;
+    ghost->nx = 11;
+    ghost->ny = 22;
+}
+void spawn_P(me* ghost){
+    ghost->name = strdup("Pinky");
+    ghost->avt = strdup("👻");
+    ghost->sym = 'P';
+    ghost->x = 11;
+    ghost->y = 23;
+    ghost->dx = 0;
+    ghost->dy = 1;
+    ghost->speed = 1;
+    ghost->nx = 11;
+    ghost->ny = 24;
+}
+void spawn_I(me* ghost){
+    ghost->name = strdup("Inky");
+    ghost->avt = strdup("👻");
+    ghost->sym = 'I';
+    ghost->x = 11;
+    ghost->y = 27;
+    ghost->dx = 0;
+    ghost->dy = -1;
+    ghost->speed = 1;
+    ghost->nx = 11;
+    ghost->ny = 26;
+}
+void spawn_C(me* ghost){
+    ghost->name = strdup("Clyde");
+    ghost->avt = strdup("👻");
+    ghost->sym = 'C';
+    ghost->x = 11;
+    ghost->y = 29;
+    ghost->dx = 0;
+    ghost->dy = -1;
+    ghost->speed = 1;
+    ghost->nx = 11;
+    ghost->ny = 28;
 }
 
