@@ -32,4 +32,6 @@ void spawn_B(me* ghost);
 void spawn_P(me* ghost);
 void spawn_I(me* ghost);
 void spawn_C(me* ghost);
+int get_state(char grid[HEIGHT][WIDTH], int flags[]);
+int u_turn(char grid[HEIGHT][WIDTH], me* ghost);
 #endif

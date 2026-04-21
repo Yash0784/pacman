@@ -31,8 +31,8 @@ int min_idx(int dist[], int size){
 }
 
 void change_pos(char grid[HEIGHT][WIDTH], me* ply){
-    if(ply->nx == 11 && ply->ny == 51 && ply->dy == 1) ply->ny = 0;
-    if(ply->nx == 11 && ply->ny == 0 && ply->dy == -1) ply->ny = 51;
+    if(ply->nx == 11 && ply->ny == 49 && ply->dy == 1) ply->ny = 0;
+    if(ply->nx == 11 && ply->ny == 1 && ply->dy == -1) ply->ny = 51;
     if(ply->sym == 'p'){
         grid[ply->x][ply->y] = ' ';
         grid[ply->x][ply->y + 1] = ' ';        
@@ -145,7 +145,7 @@ int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y){
 int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
     int move_valid[] = {1, 1, 1, 1};
     valid_moves = 0;
-    if(valid_moves = -1){
+    if(valid_moves == -1){
         for(int i = 0; i < 4; i++){
             if ((dx[i] == -(ghost->dx) && dy[i] == -(ghost->dy))) {
                 move_valid[i] = 0;
@@ -162,7 +162,7 @@ int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
         }
     }
 
-    if(valid_moves == 1){
+    /*if(valid_moves == 1){
         for(int i = 0; i < 4; i++){
             if(move_valid[i]){
                 ghost->dx = dx[i]; ghost->dy = dy[i];
@@ -171,7 +171,7 @@ int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
         ghost->nx = ghost->x + ghost->dx; ghost->ny = ghost->y + ghost->dy;
         change_pos(grid, ghost);
         return 1;
-    }
+    }*/
 
     if (valid_moves == 0) {
         ghost->dx = -(ghost->dx);
@@ -182,26 +182,23 @@ int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
         return 1;
     }
 
-    if(valid_moves > 1){
-        int min = 0;
-        int max = 3;
-        int ran = (rand() % (max - min + 1)) + min; 
-        ghost->dx = dx[ran];
-        ghost->dy = dy[ran];
+    if(valid_moves >= 1){
+        int i;
+        for(int i = 0; i < 4; i++){
+            if(move_valid[i]) break;
+        }
+        ghost->dx = dx[i];
+        ghost->dy = dy[i];
         ghost->nx = ghost->x + ghost->dx; 
         ghost->ny = ghost->y + ghost->dy;
-        if(grid[ghost->nx][ghost->ny] != '#' && grid[ghost->nx][ghost->ny + 1] != '#'){
-            change_pos(grid, ghost);
-            return 1;
-        }
-        pick_random_dir(grid, ghost, valid_moves);
+        change_pos(grid, ghost);
         return 0;
     }
 }
 
 void spawn_p(me* ply){
     ply->name = strdup("Pacman");
-    ply->avt = strdup("ᗧ");
+    ply->avt = strdup("ᗧ ");
     ply->sym = 'p';
     ply->x = 1;
     ply->y = 1;
@@ -213,7 +210,7 @@ void spawn_p(me* ply){
 }
 void spawn_B(me* ghost){
     ghost->name = strdup("Blinky");
-    ghost->avt = strdup("👻");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'B';
     ghost->x = 11;
     ghost->y = 21;
@@ -225,7 +222,7 @@ void spawn_B(me* ghost){
 }
 void spawn_P(me* ghost){
     ghost->name = strdup("Pinky");
-    ghost->avt = strdup("👻");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'P';
     ghost->x = 11;
     ghost->y = 23;
@@ -237,7 +234,7 @@ void spawn_P(me* ghost){
 }
 void spawn_I(me* ghost){
     ghost->name = strdup("Inky");
-    ghost->avt = strdup("👻");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'I';
     ghost->x = 11;
     ghost->y = 27;
@@ -249,7 +246,7 @@ void spawn_I(me* ghost){
 }
 void spawn_C(me* ghost){
     ghost->name = strdup("Clyde");
-    ghost->avt = strdup("👻");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'C';
     ghost->x = 11;
     ghost->y = 29;
@@ -260,3 +257,25 @@ void spawn_C(me* ghost){
     ghost->ny = 28;
 }
 
+
+int get_state(char grid[HEIGHT][WIDTH], int flags[]){
+    int x[] = {9, 2, 16, 22};
+    int y[] = {17, 38, 28, 5};
+    for(int i = 0; i < 4; i++){
+        if(grid[x[i]][y[i]] != 'o' && flags[i]){
+            flags[i] = 0; return 1;
+        }
+    }
+    return 0;
+}
+
+int u_turn(char grid[HEIGHT][WIDTH], me* ghost){
+    ghost->dx = -(ghost->dx);
+    ghost->dy = -(ghost->dy);
+    ghost->nx = ghost->x + ghost->dx;
+    ghost->ny = ghost->y + ghost->dy;
+    if(grid[ghost->nx][ghost->ny] != '#' && grid[ghost->nx][ghost->ny + 1] != '#'){
+        change_pos(grid, ghost);
+        return 1;
+    }
+}

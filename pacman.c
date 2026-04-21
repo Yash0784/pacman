@@ -25,6 +25,9 @@
 char ghost_color[] = {RED_BLACK, MAGENTA_BLACK, CYAN_BLACK, YELLOW};
 int game = 1;
 int rem_lives = 3;
+int frightened = 0;
+int f_flag = 1;
+int buff_flags[] = {1, 1, 1, 1};
 
 me* ply;
 char grid[HEIGHT][WIDTH];
@@ -44,6 +47,7 @@ void loadgrid(){
 }
 
 void print_grid(){
+    int is_frightened = frightened;
     for(int y = 0; y < HEIGHT; y++){
         for(int x = 0; x < WIDTH; x++){
             if(new_grid[y][x] != '\0'){
@@ -60,14 +64,27 @@ void print_grid(){
                         }
                         else{
                             if(new_grid[y][x] == 'p'){
-                                //attron(COLOR_PAIR(GREEN_BLACK));
+                                attron(COLOR_PAIR(GREEN_BLACK));
                                 mvaddstr(y, x, get_avt(new_grid[y][x]));
-                                //attroff(COLOR_PAIR(GREEN_BLACK));
+                                attroff(COLOR_PAIR(GREEN_BLACK));
+                            }
+                            else if(grid[y][x] == 'o'){
+                                attron(COLOR_PAIR(YELLOW)); // Yellow
+                                mvaddstr(y, x, "●");
+                                attroff(COLOR_PAIR(YELLOW));
                             }
                             else{
-                                //attron(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
-                                mvaddstr(y, x, get_avt(new_grid[y][x]));
-                                //attroff(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                if(!is_frightened){
+                                    attron(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                    mvaddstr(y, x, get_avt(new_grid[y][x]));
+                                    attroff(COLOR_PAIR(ghost_color[get_ind(new_grid[y][x])]));
+                                }
+                                else{
+                                    attron(COLOR_PAIR(CYAN_BLACK));
+                                    mvaddstr(y, x, get_avt(new_grid[y][x]));
+                                    attroff(COLOR_PAIR(CYAN_BLACK));
+                                }
+                                
                             }
                             //debug here
                             x++;
@@ -106,12 +123,12 @@ void pacman(){
     print_grid();
     refresh();
     int scat = 0;
-    int frightened = 0;
     int buff_in = -1;
     int in = -1;
     int curr_in;
     int started = 0;
     int blink = 0;
+    time_t fri_str;
     time_t start_time = time(NULL);
     while(game && rem_lives){
         //for(int i = 0; i < rem_lives; i++){
@@ -144,7 +161,14 @@ void pacman(){
             refresh();
             napms(100);
         }
-
+        if(get_state(grid, buff_flags)){
+            fri_str = time(NULL);
+            frightened = 1;
+        }
+        if(difftime(current_time, fri_str) > 7){
+            frightened = 0;
+            f_flag = 1;
+        }
         if(in == 'q'){
             game = 0;
             continue;
@@ -155,8 +179,16 @@ void pacman(){
             }
             else{
                 if(frightened){
-                    for(int i = 0; i < 4; i++){
-                        pick_random_dir(grid, ghosts[i], -1);
+                    if(f_flag){
+                        for(int i = 0; i < 4; i++){
+                            u_turn(grid, ghosts[i]);
+                        }
+                        f_flag = 0;
+                    }
+                    else{
+                        for(int i = 0; i < 4; i++){
+                            move_away(grid, ghosts[i], ply);
+                        }
                     }
                 }
                 else{
@@ -201,19 +233,29 @@ void pacman(){
             if(((abs(ply->x - ghosts[i]->x) + abs(ply->y - ghosts[i]->y)) == 1 && ply->dx == - ghosts[i]->dx && ply->dy == - ghosts[i]->dy) || (ply->x == ghosts[i]->x && ply->y == ghosts[i]->y)) c[i] = 1;
         }
         if(c[0] || c[1] || c[2] || c[3]){
-            rem_lives--;
-            clear();
-            if(rem_lives == 0){
-                game = 0;
+            if(!frightened){
+                rem_lives--;
+                clear();
+                if(rem_lives == 0){
+                    game = 0;
+                }
+                else{
+                    start_time = time(NULL);
+                    time_elapsed = 0;
+                    spawn_p(ply);
+                    spawn_B(ghosts[0]);
+                    spawn_P(ghosts[1]);
+                    spawn_I(ghosts[2]);
+                    spawn_C(ghosts[3]);
+                }
             }
             else{
-                start_time = time(NULL);
-                time_elapsed = 0;
-                spawn_p(ply);
-                spawn_B(ghosts[0]);
-                spawn_P(ghosts[1]);
-                spawn_I(ghosts[2]);
-                spawn_C(ghosts[3]);
+                for(int i = 0; i < 4; i++){
+                    if(i == 0&&c[i]) spawn_B(ghosts[0]);
+                    if(i == 1&&c[i]) spawn_P(ghosts[1]);
+                    if(i == 2&&c[i]) spawn_I(ghosts[2]);
+                    if(i == 3&&c[i]) spawn_C(ghosts[3]);
+                }
             }
         }
         flushinp();

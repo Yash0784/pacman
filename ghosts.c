@@ -68,3 +68,11 @@ int get_inky_pos(char grid[HEIGHT][WIDTH], me* inky, me* blinky, me* ply){
     greedy_move(grid, inky, x, y);
     return 0;
 }
+
+
+int move_away(char grid[HEIGHT][WIDTH], me* ghost, me* ply){
+    int x, y;
+    x = 4 + 2*(ply->x) - ghost->x; y = 4 + 2*(ply->y) - ghost->y;
+    greedy_move(grid, ghost, x, y);
+    return 0;
+}
