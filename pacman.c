@@ -28,6 +28,7 @@ int rem_lives = 3;
 int frightened = 0;
 int f_flag = 1;
 int buff_flags[] = {1, 1, 1, 1};
+int ghost_deployed[] = {1, 1, 1, 1};
 
 me* ply;
 char grid[HEIGHT][WIDTH];
@@ -168,6 +169,11 @@ void pacman(){
         if(difftime(current_time, fri_str) > 7){
             frightened = 0;
             f_flag = 1;
+            ghost_deployed[0] = 1;
+            ghost_deployed[1] = 1;
+            ghost_deployed[2] = 1;
+            ghost_deployed[3] = 1;
+
         }
         if(in == 'q'){
             game = 0;
@@ -187,20 +193,25 @@ void pacman(){
                     }
                     else{
                         for(int i = 0; i < 4; i++){
-                            move_away(grid, ghosts[i], ply);
+                            if(ghost_deployed[i])move_away(grid, ghosts[i], ply);
                         }
                     }
                 }
                 else{
-                    target_pacman(grid, ply, ghosts[0]);
-                    target_ahead(grid, ply->x + 4*ply->dx, ply->y + 4*ply->dy, ghosts[1]);
-                    if(calc_man_dist(ply->x, ply->y, ghosts[3]->x, ghosts[3]->y) > 8){
-                        target_pacman(grid, ply, ghosts[3]);
+                    if(ghost_deployed[0])
+                        target_pacman(grid, ply, ghosts[0]);
+                    if(ghost_deployed[1])
+                        target_ahead(grid, ply->x + 4*ply->dx, ply->y + 4*ply->dy, ghosts[1]);
+                    if(ghost_deployed[3]){
+                        if(calc_man_dist(ply->x, ply->y, ghosts[3]->x, ghosts[3]->y) > 8){
+                            target_pacman(grid, ply, ghosts[3]);
+                        }
+                        else{
+                            greedy_move(grid, ghosts[3], 22, 1);
+                        }
                     }
-                    else{
-                        greedy_move(grid, ghosts[3], 22, 1);
-                    }
-                    get_inky_pos(grid, ghosts[2], ghosts[0], ply);
+                    if(ghost_deployed[2])
+                        get_inky_pos(grid, ghosts[2], ghosts[0], ply);
                 }
             }
         }
@@ -251,10 +262,10 @@ void pacman(){
             }
             else{
                 for(int i = 0; i < 4; i++){
-                    if(i == 0&&c[i]) spawn_B(ghosts[0]);
-                    if(i == 1&&c[i]) spawn_P(ghosts[1]);
-                    if(i == 2&&c[i]) spawn_I(ghosts[2]);
-                    if(i == 3&&c[i]) spawn_C(ghosts[3]);
+                    if(i == 0&&c[i]){spawn_B(ghosts[0]); ghost_deployed[0] = 0;}
+                    if(i == 1&&c[i]){spawn_P(ghosts[1]); ghost_deployed[1] = 0;}
+                    if(i == 2&&c[i]){spawn_I(ghosts[2]); ghost_deployed[2] = 0;}
+                    if(i == 3&&c[i]){spawn_C(ghosts[3]); ghost_deployed[2] = 0;} 
                 }
             }
         }

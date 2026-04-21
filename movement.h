@@ -13,7 +13,7 @@ typedef struct movingEntity{
     int y;
     int dx;
     int dy;
-    int speed;
+    float speed;
     int nx;
     int ny;
 }me;

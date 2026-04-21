@@ -31,8 +31,8 @@ int min_idx(int dist[], int size){
 }
 
 void change_pos(char grid[HEIGHT][WIDTH], me* ply){
-    if(ply->nx == 11 && ply->ny == 49 && ply->dy == 1) ply->ny = 0;
-    if(ply->nx == 11 && ply->ny == 1 && ply->dy == -1) ply->ny = 51;
+    if(ply->nx == 11 && ply->ny == 51 && ply->dy == 1) ply->ny = 0;
+    if(ply->nx == 11 && ply->ny == 0 && ply->dy == -1) ply->ny = 51;
     if(ply->sym == 'p'){
         grid[ply->x][ply->y] = ' ';
         grid[ply->x][ply->y + 1] = ' ';        
@@ -92,7 +92,7 @@ int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y){
         }
 
         if(grid[ghost->x + dx[i]][ghost->y + dy[i]] != '#' && 
-           grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '#'){
+           (grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '#'&&grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '\n')){
             
             dist[i] = calc_man_dist(ghost->x + dx[i], ghost->y + dy[i], dest_x, dest_y);
         }
