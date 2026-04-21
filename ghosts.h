@@ -2,7 +2,7 @@
 #include "movement.h"
 #define GHOSTS_H
 #define HEIGHT 24
-#define WIDTH 55
+#define WIDTH 54
 //❤️
 int ghost_spawn(char grid[HEIGHT][WIDTH], me* ghost);
 int scatter(char grid[HEIGHT][WIDTH], me* ghosts[], int count);

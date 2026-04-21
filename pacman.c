@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 //#define GHOST_COLOR_PAIR 1
-#define WIDTH 55
+#define WIDTH 54
 #define HEIGHT 24
 #define wall_char '#'
 #define GHOST_COLOR_PAIR 6
@@ -41,7 +41,7 @@ void loadgrid(){
     FILE* gridf = fopen("grid2copy.txt", "r");
     int h = 0;
     while(fgets(grid[h], 55, gridf) != NULL){
-        grid[h][strcspn(grid[h], "\n")] = '\0';
+        grid[h][strcspn(grid[h], "\r\n")] = '\0';
         h++;
     }
     fclose(gridf);
@@ -266,7 +266,7 @@ void pacman(){
                     if(i == 0&&c[i]){spawn_B(ghosts[0]); ghost_deployed[0] = 0;}
                     if(i == 1&&c[i]){spawn_P(ghosts[1]); ghost_deployed[1] = 0;}
                     if(i == 2&&c[i]){spawn_I(ghosts[2]); ghost_deployed[2] = 0;}
-                    if(i == 3&&c[i]){spawn_C(ghosts[3]); ghost_deployed[2] = 0;} 
+                    if(i == 3&&c[i]){spawn_C(ghosts[3]); ghost_deployed[3] = 0;} 
                 }
             }
         }

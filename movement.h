@@ -2,7 +2,7 @@
 #define PACMAN_H
 
 //#define GHOST_COLOR_PAIR 1
-#define WIDTH 55
+#define WIDTH 54
 #define HEIGHT 24
 #define wall_char '#'
 typedef struct movingEntity{

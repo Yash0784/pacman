@@ -8,7 +8,7 @@
 #include "ghosts.h"
 #include "pacman.h"
 #define GHOST_COLOR_PAIR 6
-#define WIDTH 55
+#define WIDTH 54
 #define HEIGHT 24
 #define wall_char '#'
 #define EXIT 3

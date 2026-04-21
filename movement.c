@@ -32,7 +32,7 @@ int min_idx(int dist[], int size){
 
 void change_pos(char grid[HEIGHT][WIDTH], me* ply){
     if(ply->nx == 11 && ply->ny == 51 && ply->dy == 1) ply->ny = 0;
-    if(ply->nx == 11 && ply->ny == 0 && ply->dy == -1) ply->ny = 51;
+    if(ply->nx == 11 && ply->ny == 0 && ply->dy == -1) ply->ny = 50;
     if(ply->sym == 'p'){
         grid[ply->x][ply->y] = ' ';
         grid[ply->x][ply->y + 1] = ' ';        
@@ -197,8 +197,8 @@ int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
 }
 
 void spawn_p(me* ply){
-    ply->name = strdup("Pacman");
-    ply->avt = strdup("ᗧ ");
+    ply->name = "Pacman";
+    ply->avt = "ᗧ ";
     ply->sym = 'p';
     ply->x = 1;
     ply->y = 1;
@@ -209,8 +209,8 @@ void spawn_p(me* ply){
     ply->ny = 2;
 }
 void spawn_B(me* ghost){
-    ghost->name = strdup("Blinky");
-    ghost->avt = strdup("◢◣");
+    ghost->name = "Blinky";
+    ghost->avt = "◢◣";
     ghost->sym = 'B';
     ghost->x = 11;
     ghost->y = 21;
@@ -221,8 +221,8 @@ void spawn_B(me* ghost){
     ghost->ny = 22;
 }
 void spawn_P(me* ghost){
-    ghost->name = strdup("Pinky");
-    ghost->avt = strdup("◢◣");
+    ghost->name = "Pinky";
+    ghost->avt = "◢◣";
     ghost->sym = 'P';
     ghost->x = 11;
     ghost->y = 23;
@@ -233,8 +233,8 @@ void spawn_P(me* ghost){
     ghost->ny = 24;
 }
 void spawn_I(me* ghost){
-    ghost->name = strdup("Inky");
-    ghost->avt = strdup("◢◣");
+    ghost->name = "Inky";
+    ghost->avt = "◢◣";
     ghost->sym = 'I';
     ghost->x = 11;
     ghost->y = 27;
@@ -245,8 +245,8 @@ void spawn_I(me* ghost){
     ghost->ny = 26;
 }
 void spawn_C(me* ghost){
-    ghost->name = strdup("Clyde");
-    ghost->avt = strdup("◢◣");
+    ghost->name = "Clyde";
+    ghost->avt = "◢◣";
     ghost->sym = 'C';
     ghost->x = 11;
     ghost->y = 29;
