@@ -179,6 +179,7 @@ void pacman(){
             game = 0;
             continue;
         }
+        if(frightened) scat = 0;
         if(1){//tspmoooooooooooooooooooooooooo
             if(scat){
                 scatter(grid, ghosts, 4);
