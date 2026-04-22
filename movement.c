@@ -15,7 +15,7 @@ int chocolate(int a, int b){
     return -1;
 }
 int won(){
-    if(Score == 460){
+    if(Score == 458){
         return 1;
     }
     return 0;
