@@ -197,8 +197,8 @@ The two levels use different pathfinding algorithms for ghost movement — and t
 | `pacman.c / pacman.h` | Level 1 game loop and rendering |
 | `pacman2.c / pacman2.h` | Level 2 game loop and rendering |
 | `movement.c / movement.h` | Entity movement, turn logic, spawn functions, greedy pathfinding |
-| `ghosts.c / ghosts.h` | Level 1 ghost AI (Dijkstra-based) |
-| `level2_ghosts.c / level2_ghosts.h` | Level 2 ghost AI (greedy Manhattan distance) |
+| `ghosts.c / ghosts.h` | Level 1 ghost AI (greedy Manhattan distance) |
+| `level2_ghosts.c / level2_ghosts.h` | Level 2 ghost AI (Dijkstras algo) |
 | `level2_graph.c / level2_graph.h` | Graph construction, Dijkstra precomputation, direction lookup tables |
 | `grid2copy.txt` | ASCII maze layout used by both levels |
 | `adjlist.txt` | Pre-generated adjacency list for the maze graph |
