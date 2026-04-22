@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 //#define GHOST_COLOR_PAIR 1
-#define WIDTH 54
+#define WIDTH 55
 #define HEIGHT 24
 #define wall_char '#'
 

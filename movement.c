@@ -14,6 +14,12 @@ int chocolate(int a, int b){
     }
     return -1;
 }
+int won(){
+    if(Score == 460){
+        return 1;
+    }
+    return 0;
+}
 int calc_man_dist(int x1, int y1, int x2, int y2){
     return abs(x1 - x2) + abs(y1 - y2);
 }
@@ -92,7 +98,7 @@ int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y){
         }
 
         if(grid[ghost->x + dx[i]][ghost->y + dy[i]] != '#' && 
-           (grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '#'&&grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '\n')){
+           (grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '#'&&grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] != '\0')){
             
             dist[i] = calc_man_dist(ghost->x + dx[i], ghost->y + dy[i], dest_x, dest_y);
         }
@@ -141,64 +147,9 @@ int greedy_move(char grid[HEIGHT][WIDTH], me* ghost, int dest_x, int dest_y){
 
     return 1;
 }
-
-int pick_random_dir(char grid[HEIGHT][WIDTH], me* ghost, int valid_moves){
-    int move_valid[] = {1, 1, 1, 1};
-    valid_moves = 0;
-    if(valid_moves == -1){
-        for(int i = 0; i < 4; i++){
-            if ((dx[i] == -(ghost->dx) && dy[i] == -(ghost->dy))) {
-                move_valid[i] = 0;
-                continue;
-            }
-
-            if(grid[ghost->x + dx[i]][ghost->y + dy[i]] == '#' || grid[ghost->x + dx[i]][ghost->y + dy[i] + 1] == '#'){ 
-                move_valid[i] = 0;
-            }
-        }
-        
-        for(int i = 0; i < 4; i++){
-            valid_moves += move_valid[i];
-        }
-    }
-
-    /*if(valid_moves == 1){
-        for(int i = 0; i < 4; i++){
-            if(move_valid[i]){
-                ghost->dx = dx[i]; ghost->dy = dy[i];
-            }
-        }
-        ghost->nx = ghost->x + ghost->dx; ghost->ny = ghost->y + ghost->dy;
-        change_pos(grid, ghost);
-        return 1;
-    }*/
-
-    if (valid_moves == 0) {
-        ghost->dx = -(ghost->dx);
-        ghost->dy = -(ghost->dy);
-        ghost->nx = ghost->x + ghost->dx;
-        ghost->ny = ghost->y + ghost->dy;
-        change_pos(grid, ghost);
-        return 1;
-    }
-
-    if(valid_moves >= 1){
-        int i;
-        for(int i = 0; i < 4; i++){
-            if(move_valid[i]) break;
-        }
-        ghost->dx = dx[i];
-        ghost->dy = dy[i];
-        ghost->nx = ghost->x + ghost->dx; 
-        ghost->ny = ghost->y + ghost->dy;
-        change_pos(grid, ghost);
-        return 0;
-    }
-}
-
 void spawn_p(me* ply){
-    ply->name = "Pacman";
-    ply->avt = "ᗧ ";
+    ply->name = strdup("Pacman");
+    ply->avt = strdup("ᗧ ");
     ply->sym = 'p';
     ply->x = 1;
     ply->y = 1;
@@ -209,8 +160,8 @@ void spawn_p(me* ply){
     ply->ny = 2;
 }
 void spawn_B(me* ghost){
-    ghost->name = "Blinky";
-    ghost->avt = "◢◣";
+    ghost->name = strdup("Blinky");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'B';
     ghost->x = 11;
     ghost->y = 21;
@@ -221,8 +172,8 @@ void spawn_B(me* ghost){
     ghost->ny = 22;
 }
 void spawn_P(me* ghost){
-    ghost->name = "Pinky";
-    ghost->avt = "◢◣";
+    ghost->name = strdup("Pinky");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'P';
     ghost->x = 11;
     ghost->y = 23;
@@ -233,8 +184,8 @@ void spawn_P(me* ghost){
     ghost->ny = 24;
 }
 void spawn_I(me* ghost){
-    ghost->name = "Inky";
-    ghost->avt = "◢◣";
+    ghost->name = strdup("Inky");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'I';
     ghost->x = 11;
     ghost->y = 27;
@@ -245,8 +196,8 @@ void spawn_I(me* ghost){
     ghost->ny = 26;
 }
 void spawn_C(me* ghost){
-    ghost->name = "Clyde";
-    ghost->avt = "◢◣";
+    ghost->name = strdup("Clyde");
+    ghost->avt = strdup("◢◣");
     ghost->sym = 'C';
     ghost->x = 11;
     ghost->y = 29;
@@ -278,4 +229,5 @@ int u_turn(char grid[HEIGHT][WIDTH], me* ghost){
         change_pos(grid, ghost);
         return 1;
     }
+    return 0;
 }

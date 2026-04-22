@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <time.h>
 //#define GHOST_COLOR_PAIR 1
-#define WIDTH 54
+#define WIDTH 55
 #define HEIGHT 24
 #define wall_char '#'
 #define GHOST_COLOR_PAIR 6
@@ -41,7 +41,7 @@ void loadgrid(){
     FILE* gridf = fopen("grid2copy.txt", "r");
     int h = 0;
     while(fgets(grid[h], 55, gridf) != NULL){
-        grid[h][strcspn(grid[h], "\r\n")] = '\0';
+        grid[h][strcspn(grid[h], "\n")] = '\0';
         h++;
     }
     fclose(gridf);
@@ -50,8 +50,8 @@ void loadgrid(){
 void print_grid(){
     int is_frightened = frightened;
     for(int y = 0; y < HEIGHT; y++){
-        for(int x = 0; x < WIDTH; x++){
-            if(new_grid[y][x] != '\0'){
+        for(int x = 0; x < WIDTH - 3; x++){
+            if(new_grid[y][x] != '\0' && new_grid[y][x] != '\r' && new_grid[y][x] != '\n'){
                 if(new_grid[y][x] == '#'){
                     mvaddch(y, x, ACS_CKBOARD | COLOR_PAIR(RED_RED));
                 }
@@ -64,6 +64,7 @@ void print_grid(){
                             mvaddch(y, x, new_grid[y][x]);
                         }
                         else{
+                            //if(!(x >= 0 && x < 24 && y >=0 && y < 52)) continue;
                             if(new_grid[y][x] == 'p'){
                                 attron(COLOR_PAIR(GREEN_BLACK));
                                 mvaddstr(y, x, get_avt(new_grid[y][x]));
@@ -132,6 +133,7 @@ void pacman(){
     time_t fri_str;
     time_t start_time = time(NULL);
     while(game && rem_lives){
+        if (won() == 1) {game = 0; continue;}
         //for(int i = 0; i < rem_lives; i++){
           //  mvprintw(20, 80 + 2*i, "❤️");
         //}
@@ -144,7 +146,7 @@ void pacman(){
         if(time_elapsed <= 55 && time_elapsed > 50) scat = 1;
         if(time_elapsed > 55) scat = 0;
         curr_in = getch();
-        if(curr_in != ERR){
+        if(curr_in != ERR && (curr_in == 'w' || curr_in == 'a' || curr_in == 's' || curr_in == 'd' || curr_in == 'q')){
             in = curr_in;
             started = 1;
         }
@@ -224,7 +226,7 @@ void pacman(){
                 buff_in = in;
             }
             else{ 
-                int ivturn = turn(grid, (char)buff_in, ply);
+                turn(grid, (char)buff_in, ply);
             }
         }
         put_entities();
@@ -311,6 +313,7 @@ char* get_avt(char sym){
     if(sym == 'C'){
         return ghosts[3]->avt;
     }
+    return NULL;
 }
 int get_ind(char sym){
     if(sym == 'B'){
@@ -325,4 +328,5 @@ int get_ind(char sym){
     if(sym == 'C'){
         return 3;
     }
+    return 0;
 }

@@ -2,7 +2,7 @@
 #define PACMAN_H
 
 //#define GHOST_COLOR_PAIR 1
-#define WIDTH 54
+#define WIDTH 55
 #define HEIGHT 24
 #define wall_char '#'
 typedef struct movingEntity{
@@ -34,4 +34,5 @@ void spawn_I(me* ghost);
 void spawn_C(me* ghost);
 int get_state(char grid[HEIGHT][WIDTH], int flags[]);
 int u_turn(char grid[HEIGHT][WIDTH], me* ghost);
+int won();
 #endif
